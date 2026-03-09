@@ -46,11 +46,13 @@ TitleLabel.BackgroundTransparency = 1
 TitleLabel.BorderSizePixel = 0
 TitleLabel.Position = UDim2.new(0, 0, 0, 0)
 TitleLabel.Size = UDim2.new(1, 0, 1, 0)
-TitleLabel.Font = Enum.Font.SourceSansBold
+TitleLabel.Font = Enum.Font.FredokaOne
 TitleLabel.Text = "RXL Trade"
-TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TitleLabel.TextColor3 = Color3.fromRGB(0, 150, 255)
 TitleLabel.TextScaled = true
 TitleLabel.TextSize = 24
+TitleLabel.TextStrokeColor3 = Color3.fromRGB(0, 100, 200)
+TitleLabel.TextStrokeTransparency = 0.3
 
 -- Button Container
 local ButtonContainer = Instance.new("Frame")
@@ -62,13 +64,17 @@ ButtonContainer.Position = UDim2.new(0, 10, 0, 60)
 ButtonContainer.Size = UDim2.new(1, -20, 1, -70)
 
 -- Freeze Trade Checkbox
-local FreezeTradeFrame = Instance.new("Frame")
+local FreezeTradeFrame = Instance.new("TextButton")
 FreezeTradeFrame.Name = "FreezeTradeFrame"
 FreezeTradeFrame.Parent = ButtonContainer
-FreezeTradeFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+FreezeTradeFrame.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
 FreezeTradeFrame.BorderSizePixel = 0
 FreezeTradeFrame.Position = UDim2.new(0, 0, 0, 10)
 FreezeTradeFrame.Size = UDim2.new(1, 0, 0, 40)
+FreezeTradeFrame.Font = Enum.Font.SourceSans
+FreezeTradeFrame.Text = ""
+FreezeTradeFrame.TextColor3 = Color3.fromRGB(255, 255, 255)
+FreezeTradeFrame.AutoButtonColor = false
 
 local FreezeCheckbox = Instance.new("Frame")
 FreezeCheckbox.Name = "FreezeCheckbox"
@@ -107,13 +113,17 @@ FreezeTradeLabel.TextScaled = true
 FreezeTradeLabel.TextSize = 18
 
 -- Auto Accept Checkbox
-local AutoAcceptFrame = Instance.new("Frame")
+local AutoAcceptFrame = Instance.new("TextButton")
 AutoAcceptFrame.Name = "AutoAcceptFrame"
 AutoAcceptFrame.Parent = ButtonContainer
-AutoAcceptFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+AutoAcceptFrame.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
 AutoAcceptFrame.BorderSizePixel = 0
 AutoAcceptFrame.Position = UDim2.new(0, 0, 0, 60)
 AutoAcceptFrame.Size = UDim2.new(1, 0, 0, 40)
+AutoAcceptFrame.Font = Enum.Font.SourceSans
+AutoAcceptFrame.Text = ""
+AutoAcceptFrame.TextColor3 = Color3.fromRGB(255, 255, 255)
+AutoAcceptFrame.AutoButtonColor = false
 
 local AutoCheckbox = Instance.new("Frame")
 AutoCheckbox.Name = "AutoCheckbox"
@@ -151,32 +161,6 @@ AutoAcceptLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 AutoAcceptLabel.TextScaled = true
 AutoAcceptLabel.TextSize = 18
 
--- Status Labels
-local FreezeStatus = Instance.new("TextLabel")
-FreezeStatus.Name = "FreezeStatus"
-FreezeStatus.Parent = ButtonContainer
-FreezeStatus.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-FreezeStatus.BorderSizePixel = 0
-FreezeStatus.Position = UDim2.new(0, 0, 0, 110)
-FreezeStatus.Size = UDim2.new(1, 0, 0, 20)
-FreezeStatus.Font = Enum.Font.SourceSans
-FreezeStatus.Text = "Freeze Trade: OFF"
-FreezeStatus.TextColor3 = Color3.fromRGB(255, 255, 255)
-FreezeStatus.TextScaled = true
-FreezeStatus.TextSize = 14
-
-local AutoStatus = Instance.new("TextLabel")
-AutoStatus.Name = "AutoStatus"
-AutoStatus.Parent = ButtonContainer
-AutoStatus.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-AutoStatus.BorderSizePixel = 0
-AutoStatus.Position = UDim2.new(0, 0, 0, 135)
-AutoStatus.Size = UDim2.new(1, 0, 0, 20)
-AutoStatus.Font = Enum.Font.SourceSans
-AutoStatus.Text = "Auto Accept: OFF"
-AutoStatus.TextColor3 = Color3.fromRGB(255, 255, 255)
-AutoStatus.TextScaled = true
-AutoStatus.TextSize = 14
 
 -- Variables
 local freezeTradeEnabled = false
@@ -259,12 +243,10 @@ local function updateFreezeCheckbox()
         FreezeCheckbox.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
         FreezeCheckIcon.Text = "✓"
         FreezeCheckIcon.TextColor3 = Color3.fromRGB(255, 255, 255)
-        FreezeStatus.Text = "Freeze Trade: ON"
     else
         FreezeCheckbox.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
         FreezeCheckIcon.Text = "X"
         FreezeCheckIcon.TextColor3 = Color3.fromRGB(0, 0, 0)
-        FreezeStatus.Text = "Freeze Trade: OFF"
     end
 end
 
@@ -273,12 +255,10 @@ local function updateAutoCheckbox()
         AutoCheckbox.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
         AutoCheckIcon.Text = "✓"
         AutoCheckIcon.TextColor3 = Color3.fromRGB(255, 255, 255)
-        AutoStatus.Text = "Auto Accept: ON"
     else
         AutoCheckbox.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
         AutoCheckIcon.Text = "X"
         AutoCheckIcon.TextColor3 = Color3.fromRGB(0, 0, 0)
-        AutoStatus.Text = "Auto Accept: OFF"
     end
 end
 
@@ -338,26 +318,22 @@ FreezeTradeFrame.MouseButton1Click:Connect(toggleFreezeTrade)
 AutoAcceptFrame.MouseButton1Click:Connect(toggleAutoAccept)
 
 -- Checkbox hover effects
-local function animateCheckbox(frame, checkbox)
+local function animateCheckbox(frame)
     local tweenInfo = TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-    local scaleUp = TweenService:Create(frame, tweenInfo, {BackgroundColor3 = Color3.fromRGB(70, 70, 70)})
-    local scaleDown = TweenService:Create(frame, tweenInfo, {BackgroundColor3 = Color3.fromRGB(50, 50, 50)})
+    local scaleUp = TweenService:Create(frame, tweenInfo, {BackgroundColor3 = Color3.fromRGB(180, 0, 0)})
+    local scaleDown = TweenService:Create(frame, tweenInfo, {BackgroundColor3 = Color3.fromRGB(150, 0, 0)})
     
     frame.MouseEnter:Connect(function()
-        if not freezeTradeEnabled or frame ~= FreezeTradeFrame then
-            scaleUp:Play()
-        end
+        scaleUp:Play()
     end)
     
     frame.MouseLeave:Connect(function()
-        if not freezeTradeEnabled or frame ~= FreezeTradeFrame then
-            scaleDown:Play()
-        end
+        scaleDown:Play()
     end)
 end
 
-animateCheckbox(FreezeTradeFrame, FreezeCheckbox)
-animateCheckbox(AutoAcceptFrame, AutoCheckbox)
+animateCheckbox(FreezeTradeFrame)
+animateCheckbox(AutoAcceptFrame)
 
 -- Notification System
 local function showNotification(message)
