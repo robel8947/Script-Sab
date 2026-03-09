@@ -272,26 +272,25 @@ local function toggleFreezeTrade()
     updateFreezeCheckbox()
     
     if freezeTradeEnabled then
-        -- Start monitoring for trade partners
-        connection = RunService.Heartbeat:Connect(function()
-            local otherPlayer = findOtherPlayer()
-            if otherPlayer and otherPlayer ~= frozenPlayer then
-                if frozenPlayer then
+        -- Use a slower loop instead of Heartbeat for better performance
+        connection = spawn(function()
+            while freezeTradeEnabled do
+                local otherPlayer = findOtherPlayer()
+                if otherPlayer and otherPlayer ~= frozenPlayer then
+                    if frozenPlayer then
+                        unfreezePlayer(frozenPlayer)
+                    end
+                    frozenPlayer = otherPlayer
+                    freezePlayer(frozenPlayer)
+                elseif frozenPlayer and not findTradeWindow() then
                     unfreezePlayer(frozenPlayer)
+                    frozenPlayer = nil
                 end
-                frozenPlayer = otherPlayer
-                freezePlayer(frozenPlayer)
-            elseif frozenPlayer and not findTradeWindow() then
-                unfreezePlayer(frozenPlayer)
-                frozenPlayer = nil
+                wait(0.5) -- Slower check to reduce FPS loss
             end
         end)
     else
-        if connection then
-            connection:Disconnect()
-            connection = nil
-        end
-        
+        connection = nil
         if frozenPlayer then
             unfreezePlayer(frozenPlayer)
             frozenPlayer = nil
@@ -305,15 +304,17 @@ local function toggleAutoAccept()
     
     if autoAcceptEnabled then
         -- Start auto-accept loop with better performance
-        spawn(function()
+        autoAcceptLoop = spawn(function()
             while autoAcceptEnabled do
                 local otherPlayer = findOtherPlayer()
                 if otherPlayer and findTradeWindow() then
                     setPlayerReady(otherPlayer)
                 end
-                wait(1) -- Increased wait time to reduce FPS loss
+                wait(2) -- Increased to 2 seconds to reduce FPS loss
             end
         end)
+    else
+        autoAcceptLoop = nil
     end
 end
 
