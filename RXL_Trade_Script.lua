@@ -378,22 +378,9 @@ local function showNotification(message)
     end)
 end
 
--- Keybinds
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
-    if gameProcessed then return end
-    
-    if input.KeyCode == Enum.KeyCode.F then
-        toggleFreezeTrade()
-        showNotification("Freeze Trade: " .. (freezeTradeEnabled and "ON" or "OFF"))
-    elseif input.KeyCode == Enum.KeyCode.A then
-        toggleAutoAccept()
-        showNotification("Auto Accept: " .. (autoAcceptEnabled and "ON" or "OFF"))
-    end
-end)
-
 -- Initial notification
 showNotification("RXL Trade Script Loaded!")
-showNotification("Press F for Freeze Trade, A for Auto Accept")
+showNotification("Click checkboxes to activate features")
 
 print("RXL Trade Script successfully loaded!")
-print("Features: Freeze Trade (F), Auto Accept (A)")
+print("Features: Freeze Trade, Auto Accept")
