@@ -229,10 +229,14 @@ local function setPlayerReady(player)
     local tradeWindow = findTradeWindow()
     if not tradeWindow then return end
     
+    -- Only click ready button if not already ready
     for _, obj in ipairs(tradeWindow:GetDescendants()) do
         if obj:IsA("TextButton") and (obj.Text:lower():find("ready") or obj.Text:lower():find("accept")) then
-            obj:FireServer()
-            break
+            -- Check if button is not already in "ready" state
+            if obj.Text:lower():find("ready") and not obj.Text:lower():find("unready") then
+                obj:FireServer()
+                break
+            end
         end
     end
 end
@@ -300,14 +304,14 @@ local function toggleAutoAccept()
     updateAutoCheckbox()
     
     if autoAcceptEnabled then
-        -- Start auto-accept loop
+        -- Start auto-accept loop with better performance
         spawn(function()
             while autoAcceptEnabled do
                 local otherPlayer = findOtherPlayer()
-                if otherPlayer then
+                if otherPlayer and findTradeWindow() then
                     setPlayerReady(otherPlayer)
                 end
-                wait(0.5)
+                wait(1) -- Increased wait time to reduce FPS loss
             end
         end)
     end
